@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>RACOMA · Animation B</title>
+  <style>
+    @font-face{font-family:"IBM Plex Sans";src:url("assets/fonts/ibm-plex-sans-300.ttf") format("truetype");font-style:normal;font-weight:300;font-display:swap}
+    @font-face{font-family:"IBM Plex Sans";src:url("assets/fonts/ibm-plex-sans-400.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap}
+    @font-face{font-family:"Rufina";src:url("assets/fonts/rufina-400.ttf") format("truetype");font-style:normal;font-weight:400;font-display:swap}
+    @font-face{font-family:"Rufina";src:url("assets/fonts/rufina-700.ttf") format("truetype");font-style:normal;font-weight:700;font-display:swap}
+    :root{--paper:#f7f6f3;--ink:#513c36;--muted:#c9bdaf;--footer:#c9bdaf;--line:#c9bdaf;--black:#221e1f;--cool:#b3b7b9}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",Arial,sans-serif;font-weight:300;letter-spacing:.16px}
+    h1,h2,h3,p{margin:0}
+    img{display:block;max-width:100%}
+    .nav{height:60px;padding:12px 56px 8px;display:flex;align-items:center;justify-content:space-between;background:transparent;box-shadow:none;position:fixed;inset:0 0 auto;z-index:3;color:#fff}
+    .nav.is-scrolled{background:#fff;box-shadow:0 4px 5px rgba(81,60,54,.2);color:var(--black)}
+    .nav-brand{position:relative;display:block;width:88px;height:40px}
+    .nav-brand .nav-logo{position:absolute;inset:0}
+    .nav-logo-dark{opacity:0}
+    .nav.is-scrolled .nav-logo-dark{opacity:1}
+    .nav.is-scrolled .nav-logo-white{opacity:0}
+    .nav:not(.is-scrolled) .lang{color:#fff;border-color:#fff;background-image:url("assets/chevron-down-white.svg")}
+    .brand{display:block;object-fit:contain}
+    .nav-logo{width:88px;height:40px}
+    .lang{appearance:none;height:26px;border:1px solid var(--black);border-radius:2px;background:transparent url("assets/chevron-down-dark.svg") calc(100% - 5px) center/18px 18px no-repeat;color:var(--black);padding:4px 27px 4px 8px;font:400 14px/normal "IBM Plex Sans",sans-serif;letter-spacing:.16px}
+    .hero{height:683px;background:url("assets/hero.png") center 57%/cover no-repeat;position:relative;color:#fff;overflow:hidden}
+    .hero-copy{position:absolute;left:50%;bottom:35.67px;transform:translateX(-50%);text-align:center;white-space:nowrap}
+    .hero-copy h1{font:400 24px/normal "Rufina",serif;text-shadow:none}
+    .dots{display:flex;gap:8px;justify-content:center;margin-top:16px}
+    .dot{width:24px;height:4px;border-radius:1000px;background:var(--cool);border:0;padding:0;cursor:pointer;transition:.35s}
+    .dot.active{width:120px;background:#fff}
+    .story{height:1024px;display:grid;grid-template-columns:1fr 1fr;background:var(--paper)}
+    .story-photo{background:url("assets/story.png") center/cover no-repeat}
+    .story-copy{display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+    .story-inner{width:100%;max-width:720px;position:relative;z-index:1}
+    .eyebrow{text-transform:uppercase;color:var(--muted);font-size:18px;font-weight:400;line-height:normal;margin-bottom:4px}
+    .display{font:400 48px/normal "Rufina",serif;color:var(--ink)}
+    .story-lines{margin:24px auto 0;max-width:392px;font-size:16px;line-height:normal}
+    .story-content{display:flex;flex-direction:column;gap:16px}
+    .story-lines strong{display:block;font:700 24px/normal "Rufina",serif;margin-top:32px}
+    .watermark{position:absolute;width:501.425px;height:auto;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .products{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:512px 512px}.product{display:contents}
+    .product-image{background-position:center;background-size:cover}
+    .p1{background-image:url("assets/product-1.png")}
+    .p2{background-image:url("assets/product-2.png")}
+    .product-copy{display:flex;align-items:center;justify-content:center;text-align:center;padding:56px 128px}
+    .product-copy .inner{width:100%;max-width:464px}
+    .product-copy h2{font:400 48px/normal "Rufina",serif;margin:4px 0 24px;white-space:nowrap}
+    .product-copy p{font-size:16px;line-height:normal}
+    .collection-photo{height:534px;background:url("assets/collection.png") center 86%/100% auto no-repeat}
+    .collection-body{height:519px;display:flex;align-items:stretch;padding:88px 56px 88px 0}
+    .collection-copy{width:555px;flex:0 0 555px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 15px}
+    .collection-copy h2{font:400 48px/normal "Rufina",serif;margin:4px 0 16px}
+    .collection-copy p{width:525px;font-size:16px;line-height:normal}
+    .click-hint{display:none}
+    .materials{height:343px;flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:24px}
+    .material{border:1px solid var(--line);display:grid;grid-template-columns:182.75px 1fr;background:var(--paper);min-width:0}
+    .material-image{position:relative;width:182.75px;height:100%;overflow:hidden}
+    .material-image img{position:absolute;max-width:none}
+    .material:nth-child(1) .material-image img{inset:0;width:100%;height:100%;object-fit:cover}
+    .material:nth-child(2) .material-image img{width:116.77%;height:181.97%;left:-8.38%;top:-40.98%}
+    .material:nth-child(3) .material-image img{width:121.56%;height:189.43%;left:-10.78%;top:-44.72%}
+    .material:nth-child(4) .material-image img{width:144.58%;height:106.25%;left:-22.29%;top:-3.13%}
+    .material:nth-child(5) .material-image img{width:116.17%;height:181.03%;left:-8.08%;top:-40.52%}
+    .material:nth-child(6) .material-image img{width:114.97%;height:179.17%;left:-7.49%;top:-39.58%}
+    .material-text{display:flex;justify-content:center;flex-direction:column;gap:4px;padding:16px}
+    .material h3{font:400 16px/normal "Rufina",serif;white-space:nowrap}
+    .material p{font-size:16px;line-height:normal;color:var(--muted)}
+    footer{height:192px;background:var(--footer);color:#fff;display:grid;grid-template-columns:1fr 431px;grid-template-rows:80px 16px;row-gap:40px;align-items:center;padding:40px 56px 16px;font-size:16px}
+    .contact{display:grid;grid-template-columns:max-content 1fr;grid-template-rows:repeat(3,max-content);gap:8px 16px;line-height:normal;width:100%;margin:0}.contact>div{display:contents}
+    .contact dt{text-transform:uppercase;opacity:.5}.contact dd{margin:0}.contact .address dt{font-size:14px}
+    .footer-logo{width:171px;height:auto;justify-self:center;transform:translateX(28px)}
+    .copyright{grid-column:1/-1;font-size:13px;line-height:normal;text-align:center;white-space:nowrap}
+    .reveal{opacity:1;transform:none;transition:opacity .8s ease,transform .8s ease}
+    @media(max-width:700px){
+      .nav{height:64px;padding:16px 24px}
+      .nav-brand{width:70.43px;height:32px}
+      .nav-logo{width:70.43px;height:32px}
+      .lang{height:26px}
+      .hero{height:852px;background-position:51% center}
+      .hero-copy{bottom:48px;width:100%;padding:0 24px}
+      .hero-copy h1{font-size:20px}
+      .dots{margin-top:16px}.dot{width:24px}.dot.active{width:120px}
+      .story{height:852px;display:block}.story-photo{display:none}.story-copy{height:100%;padding:0 24px}
+      .story-inner{width:100%;max-width:345px}.eyebrow{font-size:16px}.display{font-size:32px}
+      .story-lines{font-size:14px;margin-top:32px;max-width:345px}.story-content{gap:16px}.story-lines strong{font-size:24px;margin-top:32px}
+      .watermark{width:333.425px}
+      .products{display:block}
+      .product{display:flex;flex-direction:column;height:591px}
+      .product-image{height:300px;flex:0 0 300px}
+      .product-copy{height:291px;flex:0 0 291px;padding:56px 24px}
+      .product-copy h2{font-size:32px;margin:4px 0 24px}.product-copy p{font-size:14px;line-height:normal}
+      .product.one .product-image{background-image:url("assets/product-2.png");order:0}.product.one .product-copy{order:1}
+      .product.two .product-image{background-image:url("assets/product-1.png");order:0}.product.two .product-copy{order:1}
+      .collection-photo{height:300px;background-position:center;background-size:cover}
+      .collection-body{height:556px;display:block;padding:0;overflow:hidden}
+      .collection-copy{width:100%;height:311px;padding:56px 24px 24px}.collection-copy h2{font-size:32px;margin:4px 0 24px;white-space:nowrap}.collection-copy p{width:305px;font-size:14px;line-height:normal}
+      .click-hint{display:block;margin-top:48px;font-size:14px}.click-hint span{display:block;height:32px;width:14px;margin:8px auto 0;position:relative}.click-hint span img{position:absolute;left:0;top:-.25px;max-width:none}
+      .materials{height:245px;display:flex;overflow-x:auto;gap:10px;padding:0 24px 56px;scroll-snap-type:x mandatory;scrollbar-width:none}.materials::-webkit-scrollbar{display:none}
+      .material{min-width:185px;height:189px;display:grid;grid-template-columns:1fr;grid-template-rows:124px 63px;scroll-snap-align:start}.material-image{width:183px;height:124px}.material-text{padding:12px}.material h3{font-size:14px}.material p{font-size:14px;margin:0}
+      footer{height:350px;display:flex;flex-direction:column;gap:48px;justify-content:center;padding:40px 24px 20px;font-size:14px}
+      .contact{grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:24px 20px}.contact>div{display:flex;flex-direction:column;gap:6px}.contact .address{grid-column:1 / -1;margin:0}.contact dt{margin:0}.contact dd{line-height:normal}
+      .contact .address dt{font-size:14px}.footer-logo{width:118.85px;height:auto;margin:0 auto;transform:none}.copyright{font-size:11px}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}}
+  </style>
+  <link rel="stylesheet" href="hero-carousel.css">
+  <link rel="stylesheet" href="motion-presets.css">
+</head>
+<body data-motion-theme="b">
+  <header class="nav">
+    <span class="nav-brand"><img class="brand nav-logo nav-logo-white" src="assets/logo-white.svg" alt="RACOMA"><img class="brand nav-logo nav-logo-dark" src="assets/logo-dark.svg" alt="" aria-hidden="true"></span>
+    <select class="lang" aria-label="Language"><option>EN</option><option>VI</option></select>
+  </header>
+  <main>
+    <section class="hero" data-carousel-transition="wipe-right" aria-label="RACOMA living room">
+      <div class="hero-copy"><h1>A Slogan for ROCAMA</h1><div class="dots" aria-label="Hero slides"><button class="dot"></button><button class="dot"></button><button class="dot"></button><button class="dot active"></button></div></div>
+    </section>
+    <section class="story">
+      <div class="story-photo" role="img" aria-label="Curved sofa viewed from above"></div>
+      <div class="story-copy">
+        <img class="watermark" src="assets/logo-white-wide.svg" alt="" aria-hidden="true">
+        <div class="story-inner reveal">
+          <div class="eyebrow">Our Story</div>
+          <h2 class="display">Born of Wonder<br>Rooted in Legacy</h2>
+          <div class="story-lines">
+            <div class="story-content">
+              <p>1937<br>Grandpa founded RACOMA</p>
+              <p>They say, at the very beginning<br>there wasn’t even a name.</p>
+              <p>I only remember Grandpa from my childhood,<br>always full of excitement,<br>always making a new RACOMA for us to play with.</p>
+              <p>Grandpa was a man of few words.<br>What he made? was it furniture, or was it a toy?</p>
+              <p>Every day, he kept making.<br>Furniture or toy, it didn’t really matter.</p>
+            </div>
+            <strong>It just had to be fun.</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="products">
+      <div class="product one">
+        <div class="product-copy"><div class="inner reveal"><div class="eyebrow">Our Product</div><h2>Product Feature I</h2><p>Lorem ipsum dolor sit amet consectetur. Euismod congue sit pretium in sociis. Consectetur quis facilisis fermentum a hendrerit. Aenean enim posuere semper pellentesque ipsum adipiscing. Aliquam nunc lectus diam viverra neque arcu turpis.</p></div></div>
+        <div class="product-image p1" role="img" aria-label="Warm gray RACOMA sofa"></div>
+      </div>
+      <div class="product two">
+        <div class="product-image p2" role="img" aria-label="White RACOMA sofa"></div>
+        <div class="product-copy"><div class="inner reveal"><div class="eyebrow">Our Product</div><h2>Product Feature II</h2><p>Lorem ipsum dolor sit amet consectetur. Euismod congue sit pretium in sociis. Consectetur quis facilisis fermentum a hendrerit. Aenean enim posuere semper pellentesque ipsum adipiscing. Aliquam nunc lectus diam viverra neque arcu turpis.</p></div></div>
+      </div>
+    </section>
+    <section class="collection">
+      <div class="collection-photo" role="img" aria-label="Blue modular RACOMA sofa"></div>
+      <div class="collection-body">
+        <div class="collection-copy reveal"><div class="eyebrow">Fabric Collection</div><h2>Tailored to Your Taste</h2><p>Choose from a range of materials and finishes to make each piece truly your own.</p><div class="click-hint">Click<span><img src="assets/button-arrow.svg" alt=""></span></div></div>
+        <div class="materials" id="materials">
+          <article class="material"><div class="material-image"><img src="assets/fabric-1.png" alt="Fjordweave texture"></div><div class="material-text"><h3>Fjordweave</h3><p>Leather</p></div></article>
+          <article class="material"><div class="material-image"><img src="assets/fabric-2.png" alt="Ljusdal Bouclé texture"></div><div class="material-text"><h3>Ljusdal Bouclé</h3><p>Fabric</p></div></article>
+          <article class="material"><div class="material-image"><img src="assets/fabric-3.png" alt="Nordhavn Linen texture"></div><div class="material-text"><h3>Nordhavn Linen</h3><p>Leather</p></div></article>
+          <article class="material"><div class="material-image"><img src="assets/fabric-4.png" alt="Vinterholm Textile texture"></div><div class="material-text"><h3>Vinterholm Textile</h3><p>Fabric</p></div></article>
+          <article class="material"><div class="material-image"><img src="assets/fabric-5.png" alt="Skagen Wool texture"></div><div class="material-text"><h3>Skagen Wool</h3><p>Leather</p></div></article>
+          <article class="material"><div class="material-image"><img src="assets/fabric-6.png" alt="Svalen Weave texture"></div><div class="material-text"><h3>Svalen Weave</h3><p>Fabric</p></div></article>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <dl class="contact"><div><dt>Email</dt><dd>racoma@racoma.living</dd></div><div><dt>Phone</dt><dd>+84 945 570 866</dd></div><div class="address"><dt>Address</dt><dd>Xưởng C-X17a, đường D7, khu công nghiệp Phú Tân, Bình Dương, Hồ Chí Minh 75121, Vietnam</dd></div></dl>
+    <img class="brand footer-logo" src="assets/logo-white-wide.svg" alt="RACOMA">
+    <div class="copyright">©2026 RACOMA. All rights Reserved. Site by Wei-Chen Chiu</div>
+  </footer>
+  <script src="motion-presets.js"></script>
+  <script src="hero-carousel.js"></script>
+</body>
+</html>

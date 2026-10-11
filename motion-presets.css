@@ -1,0 +1,35 @@
+/* Presets affect paint only. data-motion-theme on a region overrides the page. */
+.reveal{transition:none}
+.nav{transition:background-color .3s ease,box-shadow .3s ease}
+.nav-logo{transition:opacity .3s ease}
+.lang{transition:color .3s ease,border-color .3s ease}
+.story-photo,.product-image,.collection-photo{position:relative;overflow:hidden}
+.motion-image-c::before,.motion-image-d::before{content:"";position:absolute;inset:0;background:inherit;pointer-events:none}
+.hero.motion-image-a::before,.hero.motion-image-b::before{content:"";position:absolute;inset:0;background:inherit;pointer-events:none}
+.hero.motion-image-a::before{background:var(--paper);opacity:0}
+.hero.motion-image-b::before{background:var(--paper);clip-path:inset(0 0 0 100%)}
+.hero.motion-image-d::before{content:none}
+.hero.motion-pending-a::before{opacity:1}
+.hero.motion-pending-b::before{clip-path:inset(0)}
+.motion-image-c::before{transform-origin:center bottom}
+.motion-image-d::before{transform:translateY(var(--motion-parallax,0px)) scale(1.08)}
+.hero.motion-image-d{clip-path:inset(0)}
+.fixed-photo-layer{position:fixed;inset:0;background:inherit;background-size:cover;pointer-events:none}
+.material[data-motion-theme="a"]{transition:border-color .35s ease}
+.material[data-motion-theme="b"] .material-text{position:relative}
+.material[data-motion-theme="b"] .material-text::after{content:"";position:absolute;bottom:6px;left:16px;right:16px;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .4s ease}
+.material[data-motion-theme="c"] .material-image img{transition:transform 1.4s cubic-bezier(.22,1,.36,1)}
+@media(hover:hover) and (pointer:fine){
+  .material[data-motion-theme="a"]:hover{border-color:var(--ink)}
+  .material[data-motion-theme="b"]:hover .material-text::after{transform:scaleX(1)}
+  .material[data-motion-theme="c"]:hover .material-image img{transform:scale(1.045)}
+}
+@media(max-width:700px){.fixed-photo-layer{position:absolute;inset:0}}
+@media(prefers-reduced-motion:reduce){
+  .nav,.nav-logo,.lang,.material,.material-image img,.material-text::after{transition:none!important}
+  .motion-image-c::before,.motion-image-d::before{display:none}
+  .hero.motion-image-a::before,.hero.motion-image-b::before{display:none}
+  .fixed-photo-layer{display:none}
+  .hero.motion-image-d{clip-path:none}
+  .material[data-motion-theme="c"]:hover .material-image img{transform:none}
+}

@@ -1,0 +1,12 @@
+.hero{touch-action:pan-y pinch-zoom}
+.hero::after{content:"";position:absolute;inset:0 0 auto;height:120px;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent);z-index:2;pointer-events:none}
+.hero-copy{z-index:2}
+.hero-copy h1{text-shadow:0 1px 6px rgba(0,0,0,.65)}
+.hero-carousel-outgoing,.hero-carousel-incoming{position:absolute;inset:0;z-index:1;pointer-events:none}
+.hero-carousel-incoming{transform-origin:center bottom}
+.dot:focus-visible{outline:2px solid var(--ink);outline-offset:5px}
+.dot{position:relative;overflow:hidden;transition:width .35s ease,background-color .35s ease}
+.dot.active{background:rgba(179,183,185,.65)}
+.dot-progress{position:absolute;inset:0;background:#fff;border-radius:inherit;transform:scaleX(0);transform-origin:left center;pointer-events:none}
+.dot:not(.active) .dot-progress{visibility:hidden}
+@media(prefers-reduced-motion:reduce){.dot{transition:none}}
