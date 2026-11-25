@@ -38,9 +38,16 @@
   // Text blocks preserve grouping in C; A and B follow the reading order.
   function textBlock(container) {
     if(!container) return;
-    if(themeFor(container)==='c' || themeFor(container)==='d') add(container,'text');
+    if(themeFor(container)==='c') [...container.children].forEach((element,index)=>add(element,'text',index*220));
+    else if(themeFor(container)==='d') add(container,'text');
     else [...container.querySelectorAll('.eyebrow,h1,h2,p,strong')].forEach((element,index)=>add(element,'text',Math.min(index*100,450)));
   }
+  // Off-center origin and a slight drift per photo, so the settle is not a pure center zoom.
+  const origins=[['38% 62%','-1.2%','.8%'],['64% 40%','1.2%','-.6%'],['44% 70%','-.8%','1%'],['60% 58%','1%','.6%'],['36% 44%','-1%','-.8%']];
+  $$('.hero,.story-photo,.product-image,.collection-photo').forEach((element,index)=>{
+    const [origin,x,y]=origins[index%origins.length];
+    element.style.setProperty('--origin',origin);element.style.setProperty('--drift-x',x);element.style.setProperty('--drift-y',y);
+  });
   add($('.hero'),'background');
   add($('.hero-copy h1'),'text',150);
   add($('.dots'),'group',300);
@@ -64,6 +71,43 @@
   else $$('.contact dt,.contact dd').forEach((element,index)=>add(element,'text',index*60));
   add($('.footer-logo'),'image');
   add($('.copyright'),'text',300);
+  // Fabric selection: one card at a time; page code can listen for 'fabricchange'.
+  const cards=$$('.material');
+  // Demo: hovering a fabric swaps the collection photo (placeholder sofas from existing assets).
+  const photo=$('.collection-photo');
+  const defaultPhoto='assets/collection.png';
+  const fabricPhotos=['assets/hero-bergamo.jpg','assets/hero-southampton.jpg','assets/hero-mazing.jpg','assets/product-1.png','assets/product-2.png','assets/hero.png'];
+  const swapOrigins=['40% 60%','62% 42%','46% 68%','58% 56%','36% 46%','66% 62%'];
+  let shownPhoto=defaultPhoto,selectedCard=null;
+  [defaultPhoto,...fabricPhotos].forEach(src=>{const img=new Image();img.src=src;});
+  function showPhoto(src,index=0) {
+    if(!photo || src===shownPhoto) return;
+    shownPhoto=src;
+    const layer=document.createElement('div');
+    layer.className='fabric-swap';
+    layer.style.backgroundImage='url("'+src+'")';
+    if(src!==defaultPhoto){layer.style.backgroundSize='cover';layer.style.backgroundPosition='center';}
+    layer.style.transformOrigin=swapOrigins[index%swapOrigins.length];
+    photo.append(layer);
+    if(reduced.matches) {[...photo.querySelectorAll('.fabric-swap')].slice(0,-1).forEach(old=>old.remove());return;}
+    layer.animate([{opacity:0},{opacity:1}],{duration:320,easing:'ease-out',fill:'both'});
+    layer.animate([{transform:'scale(1.14)'},{transform:'scale(1)'}],{duration:2200,easing:'cubic-bezier(.16,.8,.3,1)',fill:'both'});
+    setTimeout(()=>{[...photo.querySelectorAll('.fabric-swap')].forEach(old=>{if(old!==layer && old.compareDocumentPosition(layer)&Node.DOCUMENT_POSITION_FOLLOWING) old.remove();});},360);
+  }
+  const photoFor=card=>card?fabricPhotos[cards.indexOf(card)%fabricPhotos.length]:defaultPhoto;
+  function selectFabric(card) {
+    selectedCard=card;showPhoto(photoFor(card),cards.indexOf(card));
+    cards.forEach(item=>{const on=item===card;item.classList.toggle('is-selected',on);item.setAttribute('aria-pressed',on);});
+    document.dispatchEvent(new CustomEvent('fabricchange',{detail:{index:cards.indexOf(card),name:card.querySelector('h3')?.textContent.trim(),card}}));
+  }
+  cards.forEach(card=>{
+    card.setAttribute('role','button');card.tabIndex=0;card.setAttribute('aria-pressed','false');
+    card.addEventListener('click',()=>selectFabric(card));
+    // Hover counts as selecting; the last hovered card stays selected.
+    card.addEventListener('mouseenter',()=>selectFabric(card));
+    card.addEventListener('focus',()=>selectFabric(card));
+    card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFabric(card);}});
+  });
   // Persistent navigation is shared UI, not an entrance demonstration.
   nav.dataset.motionState='shared-navigation';
 
@@ -96,16 +140,14 @@
     }
     if(theme==='c') {
       if(kind==='background') {
-        const entrance=play(element,[{transform:'scale(1.04)'},{transform:'scale(1)'}],{...options,duration:2200,pseudoElement:'::before'});
-        if(element.matches('.hero')) entrance.finished.then(()=>{
-          if(!reduced.matches) play(element,[{transform:'scale(1)'},{transform:'scale(1.04)'}],{duration:14000,iterations:Infinity,direction:'alternate',pseudoElement:'::before',easing:'ease-in-out'});
-        },()=>{});
+        // Furniture photos only: start enlarged (CSS), then one slow exhale to 1. No loop.
+        // Wait until the photo is decoded so the first frames of the settle are not dropped (looks like a pause).
+        const url=getComputedStyle(element).backgroundImage.match(/url\(["']?(.+?)["']?\)/)?.[1];
+        const ready=url?(()=>{const img=new Image();img.src=url;return img.decode?img.decode().catch(()=>{}):Promise.resolve();})():Promise.resolve();
+        ready.then(()=>requestAnimationFrame(()=>play(element,[{transform:'scale(1.14) translate(var(--drift-x,-1.2%),var(--drift-y,.8%))'},{transform:'scale(1) translate(0,0)'}],{...options,fill:'both',duration:2200,easing:'cubic-bezier(.16,.8,.3,1)',pseudoElement:'::before'})));
       }
-      else if(kind==='image') play(element,[{scale:'1.04'},{scale:'1'}],{...options,duration:2200});
-      else if(kind==='card') {
-        play(element.querySelector('.material-image'),[{scale:'1.04'},{scale:'1'}],{...options,duration:1800});
-        play(element.querySelector('.material-text'),[{translate:'0 10px'},{translate:'0 0'}],{...options,duration:1500});
-      } else play(element,[{translate:'0 12px'},{translate:'0 0'}],{...options,duration:1500});
+      else if(kind==='image') {/* logos stay still */}
+      else play(element,[{opacity:0,translate:'0 28px'},{opacity:1,translate:'0 0'}],{...options,duration:1400});
     }
   }
   const observer = new IntersectionObserver(items=>{
@@ -120,7 +162,7 @@
     // The C theme moves immediately visible content; it never hides text.
     if(entry.element.matches('.hero')) entry.element.classList.add('motion-pending-'+entry.theme);
     else {
-      if(entry.theme==='a') entry.element.style.opacity='0';
+      if(entry.theme==='a' || (entry.theme==='c' && ['text','group','card'].includes(entry.kind))) entry.element.style.opacity='0';
       // Fully clipped targets cannot intersect. Hide paint only until the mask starts.
       if(entry.theme==='b') entry.element.style.opacity='0';
     }
