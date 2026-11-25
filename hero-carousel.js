@@ -139,7 +139,8 @@
         host.append(incoming);
         target=incoming;
         if(effect==='zoom-fade') {
-          frames=[{transform:'scale(1.06)'},{transform:'scale(1)'}];
+          // Incoming photo sits above the outgoing one: fade it in while it settles.
+          frames=[{opacity:0,transform:'scale(1.06)'},{opacity:1,transform:'scale(1)'}];
           duration=1400;
         } else {
           frames=[{transform:'translateY(100%)'},{transform:'translateY(0)'}];

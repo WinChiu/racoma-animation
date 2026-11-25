@@ -104,10 +104,22 @@
     card.setAttribute('role','button');card.tabIndex=0;card.setAttribute('aria-pressed','false');
     card.addEventListener('click',()=>selectFabric(card));
     // Hover counts as selecting; the last hovered card stays selected.
-    card.addEventListener('mouseenter',()=>selectFabric(card));
+    card.addEventListener('mouseenter',()=>{if(!mobile.matches) selectFabric(card);});
     card.addEventListener('focus',()=>selectFabric(card));
     card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectFabric(card);}});
   });
+  // Mobile: no hover. While the card row scrolls, the card nearest the hint arrow is selected.
+  const strip=$('.materials'),arrow=$('.click-hint span');
+  let pickQueued=false;
+  function pickByArrow() {
+    pickQueued=false;
+    if(!mobile.matches || !arrow) return;
+    const x=arrow.getBoundingClientRect().left+arrow.offsetWidth/2;
+    let best=null,gap=Infinity;
+    cards.forEach(card=>{const r=card.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-x);if(d<gap){gap=d;best=card;}});
+    if(best && best!==selectedCard) selectFabric(best);
+  }
+  strip?.addEventListener('scroll',()=>{if(!pickQueued){pickQueued=true;requestAnimationFrame(pickByArrow);}},{passive:true});
   // Persistent navigation is shared UI, not an entrance demonstration.
   nav.dataset.motionState='shared-navigation';
 
